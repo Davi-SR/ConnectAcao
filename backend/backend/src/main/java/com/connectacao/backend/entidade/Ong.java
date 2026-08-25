@@ -110,6 +110,17 @@ public class Ong {
         this.imagemUrl = imagemUrl;
     }
 
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime agora = LocalDateTime.now();
+        this.criadoEm = agora;
+        this.atualizadoEm = agora;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.atualizadoEm = LocalDateTime.now();
+    }
 
     // Encapsulamento
     public Long getId() {
