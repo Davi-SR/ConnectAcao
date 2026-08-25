@@ -1,5 +1,7 @@
 package com.connectacao.backend.service;
 
+import com.connectacao.backend.exception.RecursoNaoEncontradoException;
+
 import com.connectacao.backend.entidade.Usuario;
 import com.connectacao.backend.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ public class UsuarioService {
 
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
     }
 
     public Usuario cadastrar(Usuario usuario) {

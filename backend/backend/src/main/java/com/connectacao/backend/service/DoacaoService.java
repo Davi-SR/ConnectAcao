@@ -1,5 +1,9 @@
 package com.connectacao.backend.service;
 
+import com.connectacao.backend.exception.RecursoNaoEncontradoException;
+import com.connectacao.backend.exception.RequisicaoInvalidaException;
+
+
 import com.connectacao.backend.entidade.Doacao;
 import com.connectacao.backend.entidade.StatusDoacao;
 import com.connectacao.backend.repository.CampanhaRepository;
@@ -30,26 +34,31 @@ public class DoacaoService {
 
     public Doacao buscarPorId(Long id) {
         return doacaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Doação não encontrada"));
+                .orElseThrow(() ->
+                        new RecursoNaoEncontradoException("Doação não encontrada"));
     }
 
     public Doacao realizarDoacao(Doacao doacao) {
 
         if (!usuarioRepository.existsById(doacao.getUsuarioId())) {
-            throw new RuntimeException("Usuário não encontrado");
+            throw new RecursoNaoEncontradoException("Usuário não encontrado");
         }
 
         if (!campanhaRepository.existsById(doacao.getCampanhaId())) {
-            throw new RuntimeException("Campanha não encontrada");
+            throw new RecursoNaoEncontradoException("Campanha não encontrada");
         }
 
         if (doacao.getValor() == null ||
                 doacao.getValor().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("O valor da doação deve ser maior que zero");
+            throw new RequisicaoInvalidaException(
+                    "O valor da doação deve ser maior que zero"
+            );
         }
 
         if (doacao.getFormaPagamento() == null) {
-            throw new RuntimeException("Forma de pagamento é obrigatória");
+            throw new RequisicaoInvalidaException(
+                    "Forma de pagamento é obrigatória"
+            );
         }
 
         doacao.setStatus(StatusDoacao.PENDENTE);
@@ -61,7 +70,7 @@ public class DoacaoService {
     public List<Doacao> listarPorUsuario(Long usuarioId) {
 
         if (!usuarioRepository.existsById(usuarioId)) {
-            throw new RuntimeException("Usuário não encontrado");
+            throw new RecursoNaoEncontradoException("Usuário não encontrado");
         }
 
         return doacaoRepository.findByUsuarioId(usuarioId);

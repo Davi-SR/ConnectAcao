@@ -1,5 +1,8 @@
 package com.connectacao.backend.service;
 
+import com.connectacao.backend.exception.RecursoNaoEncontradoException;
+import com.connectacao.backend.exception.ConflitoException;
+
 import com.connectacao.backend.entidade.Favorito;
 import com.connectacao.backend.entidade.Ong;
 import com.connectacao.backend.repository.FavoritoRepository;
@@ -30,29 +33,30 @@ public class FavoritoService {
     public List<Ong> listarFavoritos(Long usuarioId) {
 
         if (!usuarioRepository.existsById(usuarioId)) {
-            throw new RuntimeException("Usuário não encontrado");
+            throw new RecursoNaoEncontradoException("Usuário não encontrado");
         }
 
         List<Favorito> favoritos = favoritoRepository.findByUsuarioId(usuarioId);
 
         return favoritos.stream()
                 .map(favorito -> ongRepository.findById(favorito.getOngId())
-                        .orElseThrow(() -> new RuntimeException("ONG não encontrada")))
+                        .orElseThrow(() ->
+                                new RecursoNaoEncontradoException("ONG não encontrada")))
                 .toList();
     }
 
     public Favorito favoritar(Long usuarioId, Long ongId) {
 
         if (!usuarioRepository.existsById(usuarioId)) {
-            throw new RuntimeException("Usuário não encontrado");
+            throw new RecursoNaoEncontradoException("Usuário não encontrado");
         }
 
         if (!ongRepository.existsById(ongId)) {
-            throw new RuntimeException("ONG não encontrada");
+            throw new RecursoNaoEncontradoException("ONG não encontrada");
         }
 
         if (favoritoRepository.existsByUsuarioIdAndOngId(usuarioId, ongId)) {
-            throw new RuntimeException("ONG já está nos favoritos");
+            throw new ConflitoException("ONG já está nos favoritos");
         }
 
         Favorito favorito = new Favorito(usuarioId, ongId);
@@ -64,11 +68,11 @@ public class FavoritoService {
     public void desfavoritar(Long usuarioId, Long ongId) {
 
         if (!usuarioRepository.existsById(usuarioId)) {
-            throw new RuntimeException("Usuário não encontrado");
+            throw new RecursoNaoEncontradoException("Usuário não encontrado");
         }
 
         if (!favoritoRepository.existsByUsuarioIdAndOngId(usuarioId, ongId)) {
-            throw new RuntimeException("Favorito não encontrado");
+            throw new RecursoNaoEncontradoException("Favorito não encontrado");
         }
 
         favoritoRepository.deleteByUsuarioIdAndOngId(usuarioId, ongId);
