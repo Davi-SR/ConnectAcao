@@ -27,10 +27,10 @@ public class Usuario {
     @Column(name = "foto_url", length = 500)
     private String fotoUrl;
 
-    @Column(name = "criado_em")
+    @Column(name = "criado_em", nullable = false)
     private LocalDateTime criadoEm;
 
-    @Column(name = "atualizado_em")
+    @Column(name = "atualizado_em", nullable = false)
     private LocalDateTime atualizadoEm;
 
     public Usuario() {

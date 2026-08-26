@@ -26,12 +26,12 @@ public class Doacao {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "forma_pagamento", nullable = false)
+    @Column(name = "forma_pagamento", nullable = false, columnDefinition = "forma_pagamento")
     private FormaPagamento formaPagamento;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "status_doacao")
     private StatusDoacao status;
 
     @Column(name = "data_doacao")
