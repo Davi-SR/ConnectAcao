@@ -1,26 +1,38 @@
+import { getToken } from './authStorage';
+
 const configuredApiUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
 
 if (!configuredApiUrl) {
-  console.warn(
-    'EXPO_PUBLIC_API_URL não está configurada. Crie mobile/.env a partir de mobile/.env.example.',
-  );
+  console.warn('EXPO_PUBLIC_API_URL não está configurada. Crie mobile/.env a partir de mobile/.env.example.');
 }
 
 export const API_BASE_URL = configuredApiUrl?.replace(/\/$/, '') ?? '';
 
+export class ApiError extends Error {
+  constructor(public readonly status: number, message?: string) {
+    super(message ?? `A API respondeu com HTTP ${status}.`);
+    this.name = 'ApiError';
+  }
+}
+
 export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!API_BASE_URL) {
-    throw new Error('Configure EXPO_PUBLIC_API_URL antes de acessar a API.');
+  if (!API_BASE_URL) throw new ApiError(0, 'Configure EXPO_PUBLIC_API_URL antes de acessar a API.');
+
+  let response: Response;
+  try {
+    const token = await getToken();
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...init,
+      headers: {
+        Accept: 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...init?.headers,
+      },
+    });
+  } catch {
+    throw new ApiError(0, 'Não foi possível conectar ao servidor. Verifique sua conexão.');
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { Accept: 'application/json', ...init?.headers },
-    ...init,
-  });
-
-  if (!response.ok) {
-    throw new Error(`A API respondeu com HTTP ${response.status}.`);
-  }
-
+  if (!response.ok) throw new ApiError(response.status);
   return response.json() as Promise<T>;
 }
