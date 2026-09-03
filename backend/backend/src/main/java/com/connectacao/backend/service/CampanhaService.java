@@ -1,7 +1,11 @@
 package com.connectacao.backend.service;
 
+import com.connectacao.backend.dto.campanha.CampanhaDestaqueResponse;
 import com.connectacao.backend.entidade.Campanha;
+import com.connectacao.backend.entidade.StatusCampanha;
+import com.connectacao.backend.entidade.StatusDoacao;
 import com.connectacao.backend.repository.CampanhaRepository;
+import com.connectacao.backend.repository.DoacaoRepository;
 import com.connectacao.backend.repository.OngRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,16 +29,39 @@ public class CampanhaService {
     }
 
     private final CampanhaRepository campanhaRepository;
+    private final DoacaoRepository doacaoRepository;
     private final OngRepository ongRepository;
 
-    public CampanhaService(CampanhaRepository campanhaRepository, OngRepository ongRepository) {
+    public CampanhaService(CampanhaRepository campanhaRepository, DoacaoRepository doacaoRepository,
+                           OngRepository ongRepository) {
         this.campanhaRepository = campanhaRepository;
+        this.doacaoRepository = doacaoRepository;
         this.ongRepository = ongRepository;
     }
 
     public List<Campanha> listarTodas() { return campanhaRepository.findAll(); }
 
     public Optional<Campanha> buscarPorId(Long id) { return campanhaRepository.findById(id); }
+
+    public Optional<CampanhaDestaqueResponse> buscarDestaque() {
+        return campanhaRepository.findByStatus(StatusCampanha.ATIVA).stream()
+                .map(this::paraDestaque)
+                .max((primeira, segunda) -> primeira.percentualMeta().compareTo(segunda.percentualMeta()));
+    }
+
+    private CampanhaDestaqueResponse paraDestaque(Campanha campanha) {
+        BigDecimal arrecadado = doacaoRepository.findValorTotalByCampanhaIdAndStatus(
+                campanha.getId(), StatusDoacao.CONCLUIDA);
+        if (arrecadado == null) arrecadado = BigDecimal.ZERO;
+        BigDecimal percentual = arrecadado.multiply(BigDecimal.valueOf(100))
+                .divide(campanha.getMeta(), 2, java.math.RoundingMode.HALF_UP);
+        String ongNome = ongRepository.findById(campanha.getOngId())
+                .map(ong -> ong.getNome())
+                .orElse(null);
+        return new CampanhaDestaqueResponse(campanha.getId(), campanha.getOngId(), ongNome,
+                campanha.getTitulo(), campanha.getDescricao(), campanha.getImagemUrl(), campanha.getMeta(),
+                arrecadado, percentual, campanha.getDataFim());
+    }
 
     public List<Campanha> listarPorOng(Long ongId) {
         validarOng(ongId);

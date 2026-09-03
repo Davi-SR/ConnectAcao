@@ -1,27 +1,43 @@
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import React from 'react';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { KeyboardAvoidingView, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native';
+
+import { RootStackParamList } from '../../navigation/types';
+import { AuthButton, AuthHeader, AuthTextField, FormError, PasswordField } from '../components/AuthComponents';
+import { authTheme as t } from '../../theme/authTheme';
 import { useLoginViewModel } from '../../viewmodel/useLoginViewModel';
 
-export function LoginScreen() {
+type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
+
+export function LoginScreen({ navigation }: Props) {
   const { email, senha, loading, erro, setEmail, setSenha, login } = useLoginViewModel();
+  const [senhaVisivel, setSenhaVisivel] = React.useState(false);
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <View style={styles.content}>
-        <Text style={styles.title}>ConectAção</Text>
-        <Text style={styles.subtitle}>Entre para continuar</Text>
-        <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} editable={!loading} accessibilityLabel="Email" />
-        <TextInput style={styles.input} placeholder="Senha" value={senha} onChangeText={setSenha} secureTextEntry autoCapitalize="none" autoCorrect={false} editable={!loading} accessibilityLabel="Senha" />
-        {erro ? <Text style={styles.error} accessibilityRole="alert">{erro}</Text> : null}
-        <Pressable style={[styles.button, loading && styles.disabled]} onPress={() => void login()} disabled={loading} accessibilityRole="button">
-          {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Entrar</Text>}
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+          <View style={styles.content}>
+              <AuthHeader title={'Faça parte dessa corrente\ndo bem'} description="Conecte-se para ajudar ou ser ajudado." />
+              <AuthTextField label="E-mail" icon="email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false} autoComplete="email" placeholder="seu@email.com" editable={!loading} returnKeyType="next" />
+              <PasswordField label="Senha" value={senha} onChangeText={setSenha} visible={senhaVisivel} onToggle={() => setSenhaVisivel((value) => !value)} placeholder="Digite sua senha" editable={!loading} autoCapitalize="none" autoCorrect={false} autoComplete="password" returnKeyType="done" onSubmitEditing={() => void login()} />
+              <FormError message={erro} />
+              <AuthButton title="Entrar" loading={loading} onPress={() => void login()} />
+              <View style={styles.footer}>
+                <Text style={styles.footerText}>Ainda não tem uma conta?</Text>
+                <Pressable onPress={() => navigation.navigate('Cadastro')} disabled={loading} accessibilityRole="button" accessibilityLabel="Criar conta">
+                  <Text style={styles.link}>Criar conta</Text>
+                </Pressable>
+              </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 24 }, content: { gap: 14 },
-  title: { fontSize: 30, fontWeight: '700', textAlign: 'center' }, subtitle: { textAlign: 'center', marginBottom: 12 },
-  input: { borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 14, fontSize: 16 }, error: { color: '#b00020', textAlign: 'center' },
-  button: { backgroundColor: '#208AEF', borderRadius: 8, padding: 14, alignItems: 'center' }, disabled: { opacity: 0.6 }, buttonText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  safeArea: { flex: 1, backgroundColor: t.colors.canvas }, flex: { flex: 1 },
+  scroll: { flexGrow: 1, justifyContent: 'center', padding: t.spacing.lg },
+  content: { width: '100%', maxWidth: 390, alignSelf: 'center', paddingHorizontal: 8 },
+  footer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 5, marginTop: t.spacing.xl }, footerText: { color: t.colors.text, fontFamily: 'Plus Jakarta Sans', fontSize: 14 }, link: { color: t.colors.brand, fontFamily: 'Plus Jakarta Sans', fontSize: 14, fontWeight: '800' },
 });

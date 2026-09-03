@@ -1,6 +1,7 @@
 package com.connectacao.backend.controller;
 
 import com.connectacao.backend.entidade.Campanha;
+import com.connectacao.backend.dto.campanha.CampanhaDestaqueResponse;
 import com.connectacao.backend.service.CampanhaService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,12 @@ public class CampanhaController {
 
     @GetMapping
     public List<Campanha> listarTodas() { return campanhaService.listarTodas(); }
+
+    @GetMapping("/destaque")
+    public ResponseEntity<CampanhaDestaqueResponse> destaque() {
+        return campanhaService.buscarDestaque().map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Campanha> buscarPorId(@PathVariable Long id) {
