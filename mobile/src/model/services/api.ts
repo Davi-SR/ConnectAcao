@@ -33,6 +33,13 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
     throw new ApiError(0, 'Não foi possível conectar ao servidor. Verifique sua conexão.');
   }
 
-  if (!response.ok) throw new ApiError(response.status);
+  if (!response.ok) {
+    throw new ApiError(response.status);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   return response.json() as Promise<T>;
 }
