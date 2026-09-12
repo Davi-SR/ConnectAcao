@@ -2,7 +2,6 @@ package com.connectacao.backend.service;
 
 import com.connectacao.backend.dto.usuarioong.MembroOngResponse;
 import com.connectacao.backend.dto.usuarioong.UsuarioOngCreateRequest;
-import com.connectacao.backend.entidade.Ong;
 import com.connectacao.backend.entidade.PapelOng;
 import com.connectacao.backend.entidade.Usuario;
 import com.connectacao.backend.entidade.UsuarioOng;
@@ -18,12 +17,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UsuarioOngService {
+
     private final UsuarioOngRepository usuarioOngRepository;
     private final UsuarioRepository usuarioRepository;
     private final OngRepository ongRepository;
@@ -43,11 +45,11 @@ public class UsuarioOngService {
         }
 
         List<UsuarioOng> vinculos = usuarioOngRepository.findByOngId(ongId);
-        if (vinculos.isEmpty()) {
-            return List.of();
+        if (vinculos == null || vinculos.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        List<Long> usuarioIds = vinculos.stream().map(UsuarioOng::getUsuarioId).toList();
+        List<Long> usuarioIds = vinculos.stream().map(UsuarioOng::getUsuarioId).collect(Collectors.toList());
         Map<Long, Usuario> usuariosPorId = new HashMap<>();
         for (Usuario usuario : usuarioRepository.findAllById(usuarioIds)) {
             usuariosPorId.put(usuario.getId(), usuario);
@@ -55,7 +57,7 @@ public class UsuarioOngService {
 
         return vinculos.stream()
                 .map(vinculo -> criarResposta(vinculo, usuariosPorId.get(vinculo.getUsuarioId())))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public MembroOngResponse adicionarMembro(Long ongId, Long usuarioId, UsuarioOngCreateRequest request) {

@@ -10,6 +10,14 @@ export const OngRepository = {
   listarFavoritos: (usuarioId: number) =>
       fetchJson<Ong[]>(`/usuarios/${usuarioId}/favoritos`),
 
+  favoritar: (usuarioId: number, ongId: number) =>
+      fetchJson<void>(
+          `/usuarios/${usuarioId}/favoritos/${ongId}`,
+          {
+            method: 'POST',
+          }
+      ),
+
   desfavoritar: (usuarioId: number, ongId: number) =>
       fetchJson<void>(
           `/usuarios/${usuarioId}/favoritos/${ongId}`,

@@ -8,4 +8,10 @@ export const UsuarioRepository = {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(dados),
   }),
+  buscarPorId: (id: number) => fetchJson<Usuario>(`/usuarios/${id}`),
+  atualizar: (id: number, dados: Partial<Usuario>) => fetchJson<Usuario>(`/usuarios/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dados),
+  }),
 };

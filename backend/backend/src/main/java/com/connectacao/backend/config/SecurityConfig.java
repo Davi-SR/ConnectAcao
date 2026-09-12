@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,13 +23,14 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
     @Bean
     SecretKey jwtSecretKey(@Value("${app.jwt.secret}") String secret) {
-        if (secret == null || secret.isBlank() || secret.length() < 32) {
+        if (secret == null || secret.trim().isEmpty() || secret.trim().length() < 32) {
             throw new IllegalStateException("JWT_SECRET deve possuir pelo menos 32 caracteres");
         }
-        return new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        return new SecretKeySpec(secret.trim().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
     }
 
     @Bean
@@ -59,10 +61,11 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new RestAuthenticationEntryPoint()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login", "/usuarios").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/ongs/**", "/categorias/**", "/campanhas/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/google", "/usuarios").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/ongs", "/ongs/**", "/categorias", "/categorias/**", "/campanhas", "/campanhas/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.decoder(jwtDecoder)));
         return http.build();
     }
-}
+}

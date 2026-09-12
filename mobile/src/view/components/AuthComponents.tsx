@@ -55,6 +55,61 @@ export function AuthHeader({ title, description }: { title: string; description:
   </View>;
 }
 
+export function GoogleIcon({ size = 20 }: { size?: number }) {
+  return (
+    <Image
+      source={require('../../Assets/google-logo.png')}
+      style={{ width: size, height: size }}
+      resizeMode="contain"
+      accessibilityLabel="Logo Google"
+    />
+  );
+}
+
+export function GoogleAuthButton({
+  title = 'Continuar com o Google',
+  loading = false,
+  onPress,
+}: {
+  title?: string;
+  loading?: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={loading}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      style={({ pressed }) => [
+        styles.socialButton,
+        styles.googleButton,
+        pressed && !loading && styles.socialButtonPressed,
+        loading && styles.buttonDisabled,
+      ]}
+    >
+      {loading ? (
+        <ActivityIndicator color={t.colors.ink} />
+      ) : (
+        <>
+          <GoogleIcon size={20} />
+          <Text style={styles.googleButtonText}>{title}</Text>
+        </>
+      )}
+    </Pressable>
+  );
+}
+
+export function SocialDivider({ label = 'OU ENTRE COM SEU E-MAIL' }: { label?: string }) {
+  return (
+    <View style={styles.dividerContainer}>
+      <View style={styles.dividerLine} />
+      <Text style={styles.dividerLabel}>{label}</Text>
+      <View style={styles.dividerLine} />
+    </View>
+  );
+}
+
 export function FormError({ message }: { message: string | null }) {
   if (!message) return null;
   return <View style={styles.errorBox}><Text style={styles.errorText} accessibilityRole="alert">{message}</Text></View>;
@@ -83,4 +138,11 @@ const styles = StyleSheet.create({
   input: { flex: 1, minHeight: 56, color: t.colors.ink, fontFamily: 'Plus Jakarta Sans', fontSize: 15, paddingVertical: 0, outlineStyle: 'solid', outlineWidth: 0, outlineColor: 'transparent' }, trailingButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', marginRight: -8 }, eye: { width: 22, height: 14, borderWidth: 1.7, borderColor: t.colors.muted, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }, eyePupil: { width: 5, height: 5, borderRadius: 3, backgroundColor: t.colors.muted }, eyeSlash: { position: 'absolute', width: 27, height: 1.7, backgroundColor: t.colors.muted, transform: [{ rotate: '43deg' }] },
   errorBox: { backgroundColor: t.colors.errorSurface, borderRadius: 10, borderWidth: 1, borderColor: t.colors.errorBorder, padding: 12, marginBottom: t.spacing.md }, errorText: { color: t.colors.error, fontFamily: 'Plus Jakarta Sans', fontSize: 13, lineHeight: 19, textAlign: 'center' },
   button: { minHeight: 58, borderRadius: t.radius.button, backgroundColor: t.colors.tealDark, alignItems: 'center', justifyContent: 'center', marginTop: 4 }, buttonPressed: { backgroundColor: t.colors.teal }, buttonDisabled: { opacity: 0.62 }, buttonText: { color: t.colors.surface, fontFamily: 'Plus Jakarta Sans', fontSize: 16, fontWeight: '800' },
+  socialButton: { minHeight: 54, borderRadius: t.radius.button, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: t.spacing.sm },
+  googleButton: { backgroundColor: t.colors.surface, borderWidth: 1.5, borderColor: t.colors.line },
+  googleButtonText: { color: t.colors.ink, fontFamily: 'Plus Jakarta Sans', fontSize: 15, fontWeight: '700' },
+  socialButtonPressed: { opacity: 0.76 },
+  dividerContainer: { flexDirection: 'row', alignItems: 'center', marginVertical: t.spacing.lg },
+  dividerLine: { flex: 1, height: 1, backgroundColor: t.colors.line },
+  dividerLabel: { marginHorizontal: 12, color: t.colors.muted, fontFamily: 'Plus Jakarta Sans', fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
 });

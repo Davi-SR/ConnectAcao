@@ -3,12 +3,14 @@ import { ActivityIndicator, View } from 'react-native';
 
 import { CampanhasScreen } from '../view/screens/CampanhasScreen';
 import { HomeScreen } from '../view/screens/HomeScreen';
+import { BuscarScreen } from '../view/screens/BuscarScreen';
 import { LoginScreen } from '../view/screens/LoginScreen';
 import { CadastroScreen } from '../view/screens/CadastroScreen';
 import { OngDetailsScreen } from '../view/screens/OngDetailsScreen';
-import { MainPlaceholderScreen } from '../view/screens/MainPlaceholderScreen';
+import { PerfilScreen } from '../view/screens/PerfilScreen';
 import { FavoritosScreen } from '../view/screens/FavoritosScreen';
-import { DrawerPlaceholderScreen } from '../view/screens/DrawerPlaceholderScreen';
+import { DoacoesScreen } from '../view/screens/DoacoesScreen';
+import { ConfiguracoesScreen } from '../view/screens/ConfiguracoesScreen';
 import { MainTabScreen } from '../view/components/MainTabScreen';
 import { AppDrawer } from '../view/components/AppDrawer';
 import { useAuth } from '../viewmodel/AuthContext';
@@ -74,21 +76,45 @@ export function RootNavigator() {
 
                 <Stack.Screen
                     name="Buscar"
-                    component={MainPlaceholderScreen}
                     options={{ headerShown: false }}
-                />
+                >
+                    {(props) => (
+                        <MainTabScreen
+                            activeTab="Buscar"
+                            navigation={props.navigation}
+                        >
+                            <BuscarScreen {...props} />
+                        </MainTabScreen>
+                    )}
+                </Stack.Screen>
 
                 <Stack.Screen
                     name="Doacoes"
-                    component={MainPlaceholderScreen}
                     options={{ headerShown: false }}
-                />
+                >
+                    {(props) => (
+                        <MainTabScreen
+                            activeTab="Doacoes"
+                            navigation={props.navigation}
+                        >
+                            <DoacoesScreen />
+                        </MainTabScreen>
+                    )}
+                </Stack.Screen>
 
                 <Stack.Screen
                     name="Perfil"
-                    component={MainPlaceholderScreen}
                     options={{ headerShown: false }}
-                />
+                >
+                    {(props) => (
+                        <MainTabScreen
+                            activeTab="Perfil"
+                            navigation={props.navigation}
+                        >
+                            <PerfilScreen {...props} />
+                        </MainTabScreen>
+                    )}
+                </Stack.Screen>
 
                 <Stack.Screen
                     name="Favoritos"
@@ -98,9 +124,17 @@ export function RootNavigator() {
 
                 <Stack.Screen
                     name="Configuracoes"
-                    component={DrawerPlaceholderScreen}
                     options={{ headerShown: false }}
-                />
+                >
+                    {(props) => (
+                        <MainTabScreen
+                            activeTab="Perfil"
+                            navigation={props.navigation}
+                        >
+                            <ConfiguracoesScreen />
+                        </MainTabScreen>
+                    )}
+                </Stack.Screen>
 
                 <Stack.Screen
                     name="OngDetails"

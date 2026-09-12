@@ -34,7 +34,14 @@ export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T>
   }
 
   if (!response.ok) {
-    throw new ApiError(response.status);
+    let errorMessage: string | undefined;
+    try {
+      const errorBody = await response.json();
+      errorMessage = errorBody.message || errorBody.error || errorBody.mensagem;
+    } catch {
+      // Ignora erro de parse
+    }
+    throw new ApiError(response.status, errorMessage);
   }
 
   if (response.status === 204) {

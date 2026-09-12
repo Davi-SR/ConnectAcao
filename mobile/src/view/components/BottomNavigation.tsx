@@ -51,8 +51,8 @@ export function BottomNavigation({ activeTab, navigation }: Props) {
 const styles = StyleSheet.create({
   bar: { minHeight: 92, paddingHorizontal: t.spacing.md, paddingTop: t.spacing.sm, paddingBottom: t.spacing.sm, backgroundColor: t.colors.surface, borderTopLeftRadius: t.radius.card, borderTopRightRadius: t.radius.card, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', shadowColor: t.colors.brand, shadowOffset: { width: 0, height: -3 }, shadowOpacity: 0.08, shadowRadius: 10, elevation: 8 },
   tab: { minWidth: 68, height: 64, paddingHorizontal: 10, borderRadius: t.radius.pill, alignItems: 'center', justifyContent: 'center', gap: 2 },
-  activeTab: { minWidth: 84, backgroundColor: t.colors.teal },
+  activeTab: { minWidth: 84, backgroundColor: '#5EEAD4' },
   label: { color: t.colors.muted, fontFamily: 'Plus Jakarta Sans', fontSize: 12, fontWeight: '600', lineHeight: 17 },
-  activeLabel: { color: t.colors.brand, fontWeight: '700' },
+  activeLabel: { color: t.colors.tealDark, fontWeight: '700' },
   pressed: { opacity: 0.76 },
 });

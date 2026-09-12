@@ -73,7 +73,14 @@ public class UsuarioService {
         try {
             return new UsuarioResponse(usuarioRepository.save(usuario));
         } catch (DataIntegrityViolationException exception) {
-            throw new ConflitoException("E-mail já cadastrado");
+            String msg = exception.getMessage() != null ? exception.getMessage().toLowerCase() : "";
+            Throwable root = exception.getRootCause();
+            String rootMsg = root != null && root.getMessage() != null ? root.getMessage().toLowerCase() : "";
+
+            if (msg.contains("email") || msg.contains("unique") || rootMsg.contains("email") || rootMsg.contains("unique")) {
+                throw new ConflitoException("E-mail já cadastrado");
+            }
+            throw exception;
         }
     }
 }

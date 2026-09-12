@@ -7,16 +7,17 @@ import { useAuth } from './AuthContext';
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function useCadastroViewModel() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   const cadastrar = useCallback(async () => {
-    if (loading) return;
+    if (loading || loadingGoogle) return;
     const nomeNormalizado = nome.trim();
     const emailNormalizado = email.trim().toLowerCase();
     if (!nomeNormalizado) { setErro('Informe seu nome completo.'); return; }
@@ -36,7 +37,22 @@ export function useCadastroViewModel() {
       else if (cause instanceof ApiError && cause.status === 0) setErro(cause.message);
       else setErro('Não foi possível criar sua conta agora. Tente novamente mais tarde.');
     } finally { setLoading(false); }
-  }, [confirmarSenha, email, loading, nome, senha, signIn]);
+  }, [confirmarSenha, email, loading, loadingGoogle, nome, senha, signIn]);
 
-  return { nome, email, senha, confirmarSenha, loading, erro, setNome, setEmail, setSenha, setConfirmarSenha, cadastrar };
+  const cadastrarGoogle = useCallback(async () => {
+    if (loading || loadingGoogle) return;
+    setLoadingGoogle(true); setErro(null);
+    try {
+      await signInWithGoogle();
+    } catch (cause) {
+      if (cause instanceof Error && cause.message.includes('cancelada')) {
+        return;
+      }
+      setErro(cause instanceof Error ? cause.message : 'Não foi possível cadastrar com o Google.');
+    } finally {
+      setLoadingGoogle(false);
+    }
+  }, [loading, loadingGoogle, signInWithGoogle]);
+
+  return { nome, email, senha, confirmarSenha, loading, loadingGoogle, erro, setNome, setEmail, setSenha, setConfirmarSenha, cadastrar, cadastrarGoogle };
 }

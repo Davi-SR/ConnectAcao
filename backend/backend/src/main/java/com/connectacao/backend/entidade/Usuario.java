@@ -24,7 +24,7 @@ public class Usuario {
     @Column(length = 20)
     private String telefone;
 
-    @Column(name = "foto_url", length = 500)
+    @Column(name = "foto_url", columnDefinition = "TEXT")
     private String fotoUrl;
 
     @Column(name = "criado_em", nullable = false)

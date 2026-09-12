@@ -19,6 +19,8 @@ export const authTheme = {
     errorSurface: '#FFF0F0',
     errorBorder: '#F3B7B7',
     orange: '#FB6407',
+    heart: '#E53935',
+    heartSurface: '#FFEBEE',
   },
   spacing: { xs: 6, sm: 10, md: 16, lg: 24, xl: 32, xxl: 44 },
   radius: { field: 14, card: 28, button: 14, pill: 999 },

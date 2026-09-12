@@ -4,7 +4,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Categoria } from '../../model/entities/Categoria';
 import { Ong } from '../../model/entities/Ong';
 import { authTheme as t } from '../../theme/authTheme';
-import { AppIcon, PersonIcon } from './HomeIcons';
+import { AppIcon, HeartIcon, PersonIcon } from './HomeIcons';
 
 type Props = {
   ong: Ong;
@@ -62,10 +62,10 @@ export function OngRecommendedCard({
                   pressed && onFavoritePress && styles.pressed,
                 ]}
             >
-              <AppIcon
-                  name={isFavorite ? 'favorite' : 'favorite_border'}
+              <HeartIcon
+                  filled={isFavorite}
                   size={28}
-                  color={isFavorite ? t.colors.brand : t.colors.inputBorder}
+                  color={isFavorite ? t.colors.heart : t.colors.inputBorder}
               />
             </Pressable>
           </View>

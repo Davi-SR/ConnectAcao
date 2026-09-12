@@ -41,31 +41,76 @@ public class CampanhaService {
 
     public List<Campanha> listarTodas() { return campanhaRepository.findAll(); }
 
+    public List<CampanhaDestaqueResponse> listarTodasComProgresso() {
+        return campanhaRepository.findAll().stream()
+                .map(this::paraDestaque)
+                .toList();
+    }
+
     public Optional<Campanha> buscarPorId(Long id) { return campanhaRepository.findById(id); }
 
     public Optional<CampanhaDestaqueResponse> buscarDestaque() {
-        return campanhaRepository.findByStatus(StatusCampanha.ATIVA).stream()
+        List<Campanha> ativas = campanhaRepository.findByStatus(StatusCampanha.ATIVA);
+        List<Campanha> candidatas = (ativas != null && !ativas.isEmpty()) ? ativas : campanhaRepository.findAll();
+        return candidatas.stream()
                 .map(this::paraDestaque)
-                .max((primeira, segunda) -> primeira.percentualMeta().compareTo(segunda.percentualMeta()));
+                .max((primeira, segunda) -> {
+                    // 1º Critério: Maior percentual da meta atingido
+                    BigDecimal p1 = primeira.percentualMeta() != null ? primeira.percentualMeta() : BigDecimal.ZERO;
+                    BigDecimal p2 = segunda.percentualMeta() != null ? segunda.percentualMeta() : BigDecimal.ZERO;
+                    int compPercentual = p1.compareTo(p2);
+                    if (compPercentual != 0) return compPercentual;
+
+                    // 2º Critério (Desempate): Maior volume financeiro total arrecadado
+                    BigDecimal v1 = primeira.valorArrecadado() != null ? primeira.valorArrecadado() : BigDecimal.ZERO;
+                    BigDecimal v2 = segunda.valorArrecadado() != null ? segunda.valorArrecadado() : BigDecimal.ZERO;
+                    return v1.compareTo(v2);
+                });
     }
 
     private CampanhaDestaqueResponse paraDestaque(Campanha campanha) {
-        BigDecimal arrecadado = doacaoRepository.findValorTotalByCampanhaIdAndStatus(
-                campanha.getId(), StatusDoacao.CONCLUIDA);
+        BigDecimal arrecadado = doacaoRepository.findValorTotalValidoByCampanhaId(campanha.getId());
         if (arrecadado == null) arrecadado = BigDecimal.ZERO;
-        BigDecimal percentual = arrecadado.multiply(BigDecimal.valueOf(100))
-                .divide(campanha.getMeta(), 2, java.math.RoundingMode.HALF_UP);
-        String ongNome = ongRepository.findById(campanha.getOngId())
-                .map(ong -> ong.getNome())
-                .orElse(null);
-        return new CampanhaDestaqueResponse(campanha.getId(), campanha.getOngId(), ongNome,
-                campanha.getTitulo(), campanha.getDescricao(), campanha.getImagemUrl(), campanha.getMeta(),
-                arrecadado, percentual, campanha.getDataFim());
+
+        BigDecimal percentual = BigDecimal.ZERO;
+        if (campanha.getMeta() != null && campanha.getMeta().compareTo(BigDecimal.ZERO) > 0) {
+            percentual = arrecadado.multiply(BigDecimal.valueOf(100))
+                    .divide(campanha.getMeta(), 2, java.math.RoundingMode.HALF_UP);
+        }
+
+        String ongNome = null;
+        if (campanha.getOngId() != null) {
+            ongNome = ongRepository.findById(campanha.getOngId())
+                    .map(ong -> ong.getNome())
+                    .orElse(null);
+        }
+
+        return new CampanhaDestaqueResponse(
+                campanha.getId(),
+                campanha.getOngId(),
+                ongNome,
+                campanha.getTitulo(),
+                campanha.getDescricao(),
+                campanha.getImagemUrl(),
+                campanha.getMeta() != null ? campanha.getMeta() : BigDecimal.ZERO,
+                arrecadado,
+                percentual,
+                campanha.getDataFim()
+        );
     }
 
     public List<Campanha> listarPorOng(Long ongId) {
         validarOng(ongId);
         return campanhaRepository.findByOngId(ongId);
+    }
+
+    public List<CampanhaDestaqueResponse> listarComProgressoPorOng(Long ongId) {
+        validarOng(ongId);
+        List<Campanha> campanhas = campanhaRepository.findByOngId(ongId);
+        if (campanhas == null) return List.of();
+        return campanhas.stream()
+                .map(this::paraDestaque)
+                .toList();
     }
 
     public Campanha criar(Campanha campanha) {
@@ -118,5 +163,5 @@ public class CampanhaService {
         }
     }
 
-    private boolean vazio(String valor) { return valor == null || valor.isBlank(); }
+    private boolean vazio(String valor) { return valor == null || valor.trim().isEmpty(); }
 }

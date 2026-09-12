@@ -27,7 +27,7 @@ public class CampanhaController {
     }
 
     @GetMapping
-    public List<Campanha> listarTodas() { return campanhaService.listarTodas(); }
+    public List<CampanhaDestaqueResponse> listarTodas() { return campanhaService.listarTodasComProgresso(); }
 
     @GetMapping("/destaque")
     public ResponseEntity<CampanhaDestaqueResponse> destaque() {

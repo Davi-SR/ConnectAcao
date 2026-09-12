@@ -38,7 +38,7 @@ public class DoacaoService {
     public Doacao realizarDoacao(DoacaoCreateRequest request) {
         validarRequest(request);
 
-        if (usuarioRepository.findById(request.getUsuarioId()).isEmpty()) {
+        if (!usuarioRepository.existsById(request.getUsuarioId())) {
             throw new RecursoNaoEncontradoException("Usuario nao encontrado");
         }
 
@@ -68,7 +68,7 @@ public class DoacaoService {
     }
 
     public List<Doacao> listarPorUsuario(Long usuarioId) {
-        if (usuarioId == null || usuarioRepository.findById(usuarioId).isEmpty()) {
+        if (usuarioId == null || !usuarioRepository.existsById(usuarioId)) {
             throw new RecursoNaoEncontradoException("Usuario nao encontrado");
         }
         return doacaoRepository.findByUsuarioId(usuarioId);

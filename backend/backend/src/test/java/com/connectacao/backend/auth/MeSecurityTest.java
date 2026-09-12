@@ -10,7 +10,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,7 +49,8 @@ class MeSecurityTest {
         when(usuario.getId()).thenReturn(7L);
         when(usuario.getNome()).thenReturn("Ana");
         when(usuario.getEmail()).thenReturn("ana@example.com");
-        when(usuarioService.buscarPorId(7L)).thenReturn(new UsuarioResponse(usuario));
+        UsuarioResponse response = new UsuarioResponse(usuario);
+        when(usuarioService.buscarPorId(7L)).thenReturn(response);
         String token = jwtEncoder.encode(from(JwtClaimsSet.builder()
                 .subject("7")
                 .issuedAt(Instant.now())

@@ -1,6 +1,6 @@
 package com.connectacao.backend.controller;
 
-import com.connectacao.backend.entidade.Campanha;
+import com.connectacao.backend.dto.campanha.CampanhaDestaqueResponse;
 import com.connectacao.backend.service.CampanhaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +21,9 @@ public class OngCampanhaController {
     }
 
     @GetMapping("/{ongId}/campanhas")
-    public ResponseEntity<List<Campanha>> listarPorOng(@PathVariable Long ongId) {
+    public ResponseEntity<List<CampanhaDestaqueResponse>> listarPorOng(@PathVariable Long ongId) {
         try {
-            return ResponseEntity.ok(campanhaService.listarPorOng(ongId));
+            return ResponseEntity.ok(campanhaService.listarComProgressoPorOng(ongId));
         } catch (CampanhaService.OngNaoEncontradaException exception) {
             return ResponseEntity.notFound().build();
         }

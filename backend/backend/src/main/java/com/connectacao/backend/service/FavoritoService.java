@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class FavoritoService {
@@ -37,11 +39,11 @@ public class FavoritoService {
         }
 
         List<Favorito> favoritos = favoritoRepository.findByUsuarioId(usuarioId);
-        if (favoritos.isEmpty()) {
-            return List.of();
+        if (favoritos == null || favoritos.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        List<Long> ongIds = favoritos.stream().map(Favorito::getOngId).toList();
+        List<Long> ongIds = favoritos.stream().map(Favorito::getOngId).collect(Collectors.toList());
         Map<Long, Ong> ongsPorId = new HashMap<>();
         for (Ong ong : ongRepository.findAllById(ongIds)) {
             ongsPorId.put(ong.getId(), ong);
@@ -51,7 +53,7 @@ public class FavoritoService {
                 .map(favorito -> ongsPorId.computeIfAbsent(favorito.getOngId(), id -> {
                     throw new RecursoNaoEncontradoException("ONG nao encontrada");
                 }))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public Favorito favoritar(Long usuarioId, Long ongId) {

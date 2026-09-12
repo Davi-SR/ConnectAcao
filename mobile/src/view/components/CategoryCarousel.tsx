@@ -8,7 +8,7 @@ import { CategoryChip } from './CategoryChip';
 type Props = {
   categorias: Categoria[];
   selectedCategoriaId: number | null;
-  onSelect: (id: number) => void;
+  onSelect: (id: number | null) => void;
 };
 
 type WheelViewProps = React.ComponentProps<typeof View> & {
@@ -70,6 +70,12 @@ export function CategoryCarousel({ categorias, selectedCategoriaId, onSelect }: 
         onScroll={(event) => { offsetX.current = event.nativeEvent.contentOffset.x; }}
         scrollEventThrottle={16}
       >
+        <CategoryChip
+          key="todas"
+          categoria={{ id: null, nome: 'Todas' }}
+          selected={selectedCategoriaId === null}
+          onPress={() => onSelect(null)}
+        />
         {categorias.map((categoria) => (
           <CategoryChip
             key={categoria.id}

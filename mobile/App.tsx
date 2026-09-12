@@ -1,6 +1,9 @@
+import * as WebBrowser from 'expo-web-browser';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { MaterialSymbols_500Medium } from '@expo-google-fonts/material-symbols';
+
+WebBrowser.maybeCompleteAuthSession();
 
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { AuthProvider } from './src/viewmodel/AuthContext';

@@ -1,6 +1,8 @@
 package com.connectacao.backend.controller;
 
+import com.connectacao.backend.dto.campanha.CampanhaDestaqueResponse;
 import com.connectacao.backend.entidade.Ong;
+import com.connectacao.backend.service.CampanhaService;
 import com.connectacao.backend.service.OngService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,15 +23,23 @@ import java.util.List;
 public class OngController {
 
     private final OngService ongService;
+    private final CampanhaService campanhaService;
 
-    public OngController(OngService ongService) {
+    public OngController(OngService ongService, CampanhaService campanhaService) {
         this.ongService = ongService;
+        this.campanhaService = campanhaService;
     }
 
     //CRUD das Ongs
     @GetMapping
     public List<Ong> listarTodas() {
         return ongService.listarTodas();
+    }
+
+    //Campanhas com progresso da ONG
+    @GetMapping("/{id}/campanhas")
+    public List<CampanhaDestaqueResponse> listarCampanhasPorOng(@PathVariable Long id) {
+        return campanhaService.listarComProgressoPorOng(id);
     }
 
     //Pegar pelo ID

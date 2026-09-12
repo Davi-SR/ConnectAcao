@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Campanha } from '../model/entities/Campanha';
+import { CampanhaDestaque } from '../model/entities/CampanhaDestaque';
 import { CampanhaRepository } from '../model/repositories/CampanhaRepository';
 
 export function useCampanhasViewModel(ongId: number) {
-  const [campanhas, setCampanhas] = useState<Campanha[]>([]);
+  const [campanhas, setCampanhas] = useState<CampanhaDestaque[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

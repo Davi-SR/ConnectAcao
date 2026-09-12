@@ -18,7 +18,11 @@ export function CampanhasScreen({ route }: Props) {
       data={campanhas}
       keyExtractor={(campanha) => String(campanha.id)}
       ListEmptyComponent={<ScreenMessage>Nenhuma campanha encontrada.</ScreenMessage>}
-      renderItem={({ item }) => <Text style={styles.card}>{item.titulo} - {item.status}</Text>}
+      renderItem={({ item }) => (
+        <Text style={styles.card}>
+          {item.titulo} - {Math.round(item.percentualMeta ?? 0)}% atingido
+        </Text>
+      )}
     />
   );
 }

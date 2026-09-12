@@ -41,7 +41,7 @@ class DoacaoServiceTest {
 
     @Test
     void criaDoacaoValidaComoPendenteComDataEValor() {
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(new com.connectacao.backend.entidade.Usuario()));
+        when(usuarioRepository.existsById(1L)).thenReturn(true);
         when(campanhaRepository.findById(5L)).thenReturn(Optional.of(campanha(StatusCampanha.ATIVA)));
         when(doacaoRepository.save(any(Doacao.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -55,14 +55,14 @@ class DoacaoServiceTest {
 
     @Test
     void usuarioInexistenteRetorna404() {
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
+        when(usuarioRepository.existsById(1L)).thenReturn(false);
         assertThrows(RecursoNaoEncontradoException.class, () -> service.realizarDoacao(request(new BigDecimal("10"))));
         verifyNoInteractions(campanhaRepository, doacaoRepository);
     }
 
     @Test
     void campanhaInexistenteRetorna404() {
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(new com.connectacao.backend.entidade.Usuario()));
+        when(usuarioRepository.existsById(1L)).thenReturn(true);
         when(campanhaRepository.findById(5L)).thenReturn(Optional.empty());
         assertThrows(RecursoNaoEncontradoException.class, () -> service.realizarDoacao(request(new BigDecimal("10"))));
         verifyNoInteractions(doacaoRepository);
@@ -71,7 +71,7 @@ class DoacaoServiceTest {
     @ParameterizedTest
     @EnumSource(value = StatusCampanha.class, names = {"RASCUNHO", "ENCERRADA", "CANCELADA"})
     void campanhaNaoAtivaRejeitaDoacao(StatusCampanha status) {
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(new com.connectacao.backend.entidade.Usuario()));
+        when(usuarioRepository.existsById(1L)).thenReturn(true);
         when(campanhaRepository.findById(5L)).thenReturn(Optional.of(campanha(status)));
         assertThrows(ConflitoException.class, () -> service.realizarDoacao(request(new BigDecimal("10"))));
         verifyNoInteractions(doacaoRepository);
